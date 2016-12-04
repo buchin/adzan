@@ -323,7 +323,7 @@ class Adzan{
         $second=($second<10)?"0".$second:$second;
         $minute=floor($minute);
         $minute=($minute<10)?"0".$minute:$minute;
-        return $sign.$deg1."&deg;".$minute."&quot;".$second."'";
+        return ['degree' => $sign.$deg1, 'minute' => $minute, 'second' => $second];
     }
 
     function h2hm($hours){
@@ -406,7 +406,7 @@ class Adzan{
         $this->compute_pray_times($first,$last,$yearc);
     }
 
-    public function times($timestamp)
+    public function times($timestamp, $type = 1)
     {
         $prayTime = [];
         $sholat = ['imsyak', 'subuh', 'terbit', 'dhuhur', 'ashar', 'maghrib', 'isya'];
@@ -414,11 +414,19 @@ class Adzan{
         $m = date('n', $timestamp);
         $y = date('Y', $timestamp);
 
-        $this->generate_data(1, $d, $m, $y);
-        
-        foreach ($this->prayTime as $day => $times) {
+        $this->generate_data($type, $d, $m, $y);
+        $day = 0;
+        foreach ($this->prayTime as $times) {
+
+            if($type == 1){
+                $day = $d;
+            } elseif ($type == 2) {
+                $day++;    
+            }
+
             sort($times, SORT_NUMERIC);
             foreach ($times as $key => $time) {
+
                 $prayTime[$day][$sholat[$key]] = $this->h2hm($time);
             }
         }
